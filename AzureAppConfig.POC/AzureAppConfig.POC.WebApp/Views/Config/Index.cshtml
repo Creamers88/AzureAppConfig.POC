@@ -1,0 +1,9 @@
+﻿@model AzureAppConfig.POC.WebApp.Models.ConfigSettings
+@{
+    ViewData["Title"] = "Config Demo";
+}
+
+<div class="text-center" style="background-color: @Model.Foreground.Colour">
+    <h1 class="display-4" style="color: @Model.MainHeader.Colour">@Model.MainHeader.Text</h1>
+    @Html.Raw(@Model.SubHeader.HtmlMarkup)
+</div>
