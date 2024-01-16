@@ -1,3 +1,4 @@
+using Azure.Identity;
 using AzureAppConfig.POC.WebApp.Models;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 
@@ -7,13 +8,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 var appConfigConnectionString = builder.Configuration.GetConnectionString("AppConfig");
+var appConfigSnapshot = builder.Configuration.GetValue<string>("AppConfigSnapshot");
 
 builder.Configuration.AddAzureAppConfiguration(options =>
 {
     // Specify the connection string to the app configuration endpoint.
     // Connection string is attainable under the Azure Portal.
     options.Connect(appConfigConnectionString);
-
+    
     // Filter the configuration you wish to load from Azure. Wildcards/sub-namespaces
     // can be used here to narrow down the configuration required for the app.
     options.Select("POCApp:*");
@@ -27,6 +29,15 @@ builder.Configuration.AddAzureAppConfiguration(options =>
 
         refreshOptions.SetCacheExpiration(TimeSpan.FromSeconds(5));
     });
+
+    if (!string.IsNullOrWhiteSpace(appConfigSnapshot))
+    {
+        options.SelectSnapshot(appConfigSnapshot);
+    }
+
+    // Authenticate to Azure Key Vault instance using identity provided by Visual Studio.
+    // Will need to use a different credential for test/production!
+    options.ConfigureKeyVault(kv => kv.SetCredential(new DefaultAzureCredential()));
 });
 
 // Load all Setting configuration under Azure App Config, to a Settings model.
