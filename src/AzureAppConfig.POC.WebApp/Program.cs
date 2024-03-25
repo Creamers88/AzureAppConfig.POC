@@ -1,6 +1,7 @@
 using Azure.Identity;
 using AzureAppConfig.POC.WebApp.Models;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using Microsoft.FeatureManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +39,8 @@ builder.Configuration.AddAzureAppConfiguration(options =>
     // Authenticate to Azure Key Vault instance using identity provided by Visual Studio.
     // Will need to use a different credential for test/production!
     options.ConfigureKeyVault(kv => kv.SetCredential(new DefaultAzureCredential()));
+
+    options.UseFeatureFlags();
 });
 
 // Load all Setting configuration under Azure App Config, to a Settings model.
@@ -46,6 +49,8 @@ builder.Services.Configure<ConfigSettings>(builder.Configuration.GetSection("POC
 // Include middleware dependencies for Azure App configuration
 // Only required if using dynamic configuration/refresh.
 builder.Services.AddAzureAppConfiguration();
+
+builder.Services.AddFeatureManagement(builder.Configuration.GetSection("POCApp:FeatureManagement"));
 
 var app = builder.Build();
 

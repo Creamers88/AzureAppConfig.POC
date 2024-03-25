@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using AzureAppConfig.POC.WebApp.Constants
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -25,6 +26,11 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Config" asp-action="Index">Config Demo</a>
                         </li>
+                        <feature name="@FeatureFlags.FeatureA">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="FeatureA" asp-action="Index">Feature Demo</a>
+                            </li>
+                        </feature>
                     </ul>
                 </div>
             </div>
