@@ -68,7 +68,10 @@ builder.Services.Configure<ConfigSettings>(builder.Configuration.GetSection("POC
 builder.Services.AddAzureAppConfiguration();
 
 builder.Services.AddFeatureManagement()
-    .AddFeatureFilter<DiceRollFilter>();
+    .AddFeatureFilter<DiceRollFilter>()
+    .WithTargeting<CurrentUserTargetingContextAccessor>();
+
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
