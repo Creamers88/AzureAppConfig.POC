@@ -1,4 +1,5 @@
 using Azure.Identity;
+using AzureAppConfig.POC.WebApp.FeatureManagement.Filters;
 using AzureAppConfig.POC.WebApp.Models;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.FeatureManagement;
@@ -40,7 +41,11 @@ builder.Configuration.AddAzureAppConfiguration(options =>
     // Will need to use a different credential for test/production!
     options.ConfigureKeyVault(kv => kv.SetCredential(new DefaultAzureCredential()));
 
-    options.UseFeatureFlags();
+    options.UseFeatureFlags(featureFlagOptions =>
+    {
+        featureFlagOptions.Select(KeyFilter.Any , "dev");
+        featureFlagOptions.CacheExpirationInterval = TimeSpan.FromSeconds(3);
+    });
 });
 
 // Load all Setting configuration under Azure App Config, to a Settings model.
@@ -50,7 +55,8 @@ builder.Services.Configure<ConfigSettings>(builder.Configuration.GetSection("POC
 // Only required if using dynamic configuration/refresh.
 builder.Services.AddAzureAppConfiguration();
 
-builder.Services.AddFeatureManagement(builder.Configuration.GetSection("POCApp:FeatureManagement"));
+builder.Services.AddFeatureManagement()
+    .AddFeatureFilter<DiceRollFilter>();
 
 var app = builder.Build();
 
