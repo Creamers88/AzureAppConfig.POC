@@ -1,13 +1,25 @@
 using Azure.Identity;
 using AzureAppConfig.POC.WebApp.FeatureManagement.Filters;
 using AzureAppConfig.POC.WebApp.Models;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.FeatureManagement;
+using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.UI;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+
+builder.Services.AddAuthorization(options =>
+{
+    // By default, all incoming requests will be authorized according to the default policy.
+    options.FallbackPolicy = options.DefaultPolicy;
+});
+builder.Services.AddRazorPages()
+    .AddMicrosoftIdentityUI();
 
 var appConfigConnectionString = builder.Configuration.GetConnectionString("AppConfig");
 var appConfigSnapshot = builder.Configuration.GetValue<string>("AppConfigSnapshot");
